@@ -8,7 +8,7 @@ import json
 def load_config(file_path="config.yaml"):
     with open(file_path, "r") as f:
         return yaml.safe_load(f)
-    
+
 config = load_config()
 
 mqtt_id = config["mqtt"]["client_id"]
@@ -18,12 +18,13 @@ os.makedirs(upload_folder, exist_ok=True)
 app = Flask(__name__)
 mqtt_client = MQTT(mqtt_id)
 
+
 def mqtt_loop():
     mqtt_client.connect()
     mqtt_client.subscribe("cluster/clients/stats/#")
-
-def main():
-    threading.Thread(target=mqtt_loop, daemon=True).start()
+   
+    while True:
+        pass  
 
 @app.route("/")
 def index():
@@ -43,10 +44,11 @@ def upload():
         "dict_file": wordlist_name
     }
 
-    mqtt_client.publish("cluster/tasks/new", json.dumps(task))
     print(f"[>] Отправка задачи: {task}")
+    mqtt_client.publish("cluster/tasks/new", json.dumps(task))
+
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    main()
-    app.run(config["web"]["ip"], config["web"]["port"], debug=True) 
+    threading.Thread(target=mqtt_loop, daemon=True).start()  
+    app.run(config["web"]["ip"], config["web"]["port"], debug=True, use_reloader=False)

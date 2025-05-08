@@ -8,7 +8,7 @@ mqtt:
   port: 1883
   username: ""
   password: ""
-  client_id: "web-hui"
+  client_id: "web-ui"
 
 dirs: 
   uploads: "/home/mavotronik/cluster-test"
